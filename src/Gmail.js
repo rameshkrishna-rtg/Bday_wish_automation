@@ -1,4 +1,4 @@
-const { error } = require("node:console");
+
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
@@ -9,6 +9,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
+
 
 const mailOptions = {
     from: "rameshkrishnartg@gamil.com",
