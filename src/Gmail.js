@@ -9,7 +9,12 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
-
+const mailOptions = {
+    from: "rameshkrishnartg@gamil.com",
+    to: "iamkrish423@gmail.com",
+    subject: "Hello from rtg",
+    text: "This is a test mail"   
+};
 
 
 
