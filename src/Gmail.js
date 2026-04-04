@@ -15,7 +15,13 @@ const mailOptions = {
     subject: "Hello from rtg",
     text: "This is a test mail"   
 };
-
+transporter.sendMail(mailOptions, (error,info)=> {
+    if(error){
+        console.log("Error sending email: ",error);
+    } else {
+        console.log("Email sent successfully!", info.response)
+    }
+})
 
 
 
