@@ -23,27 +23,31 @@ const sendMail = async (req, res) => {
         }
 
         const mailOptions = {
-            from: from,
+            from: req.body.from,
             to: to,
             subject: subject,
             body: body,
             attachments
         };
-        transporter.sendMail(mailOptions, (error) => {
-            if (error) {
-                console.log("Error sending email: ", error.message);
-                res.status(500).json({
-                    status: "error",
-                    message: "Internal server error"
-                })
-            } else {
-                
-                res.status(200).json({
-                    status: "success",
-                    message: "Email sent successfully!"
-                })
+        const sendmail = await transporter.sendMail(mailOptions);
+        console.log("Email sent successfully: ");
+
+        await db.emailLogs.create({
+            data: {
+                from,
+                to,
+                subject,
+                body,
+                attachments,
+                status: "SUCCESS"
             }
         })
+        return res.status(200).json({
+            status: "success",
+            message: "Email sent successfully!"
+        })
+
+
 
     } catch (error) {
 
