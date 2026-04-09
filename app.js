@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const mailRoute = require("../email_sender/src/route")
+const mailRoute = require("./src/routes/gmailRoutes")
 
 app.use(express.json());
 
