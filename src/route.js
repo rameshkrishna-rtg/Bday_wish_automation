@@ -1,5 +1,8 @@
 const express = require("express");
-
 const route = express.Router();
 
-route.post()
+const { sendMail } = require("../src/Gmail")
+
+route.post("/email", sendMail)
+
+module.exports = route
