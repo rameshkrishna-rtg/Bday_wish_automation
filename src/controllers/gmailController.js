@@ -43,7 +43,7 @@ const sendBirthdayWishes = async (req, res) => {
             }
         });
 
-        if(birthdays.length === 0){
+        if (birthdays.length === 0) {
             console.log("No birthdays today");
             return res.status(200).json({
                 status: "success",
@@ -53,6 +53,57 @@ const sendBirthdayWishes = async (req, res) => {
 
         console.log("Birthdays found: ", birthdays.length);
 
+        //send email to each user
+        for (const user of birthdays) {
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: "Happy Birthday",
+                body: `Hey ${user.name}! hope you are doing well and having a great day. `,
+                attachments
+            };
+
+            try {
+                await transporter.sendMail(mailOptions);
+                console.log("Email sent successfully: ");
+
+                await db.emailLogs.create({
+                    data: {
+                        from,
+                        friend_id: user.id,
+                        subject,
+                        body,
+                        attachments,
+                        status: "SUCCESS"
+                    }
+                })
+
+                console.log("Email sent successfully: ", user.email);
+
+                return res.status(200).json({
+                    status: "success",
+                    message: "Email sent successfully!"
+                })
+
+            } catch (error) {
+                console.log(`Email not sent for ${user.email}`, error.message)
+
+                await db.emailLogs.create({
+                    data: {
+                        from,
+                        friend_id: user.id,
+                        subject,
+                        body,
+                        attachments,
+                        status: "FAILED"
+                    }
+                })
+                return res.status(500).json({
+                    status: "error",
+                    message: "Email sending failed"
+                })
+            }
+        }
 
 
 
@@ -92,45 +143,6 @@ const sendMail = async (req, res) => {
             body: body,
             attachments
         };
-
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log("Email sent successfully: ");
-
-            await db.emailLogs.create({
-                data: {
-                    from,
-                    subject,
-                    body,
-                    attachments,
-                    status: "SUCCESS"
-                }
-            })
-            return res.status(200).json({
-                status: "success",
-                message: "Email sent successfully!"
-            })
-
-        } catch (error) {
-            console.log("Email not sent", error.message)
-
-            await db.emailLogs.create({
-                data: {
-                    from,
-                    subject,
-                    body,
-                    attachments,
-                    status: "FAILED"
-                }
-            })
-            return res.status(500).json({
-                status: "error",
-                message: "Email sending failed"
-            })
-        }
-
-
-
 
 
     } catch (error) {
