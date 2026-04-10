@@ -3,19 +3,19 @@ const db = require("../configs/dbConfig")
 //POST - /web/friend/create
 const addFriends = async (req, res) => {
     try {
-        const { name, email, dob } = req.body
+        const { name, email, birthday, birthMonth } = req.body
 
-        if (!name || !email || !dob) {
+        if (!name || !email || !birthday || !birthMonth) {
             return res.status(400).json({
                 status: "error",
                 message: "Name, email and date are required fields"
             })
         };
 
-        if (!name.trim() || !email.trim() || !dob.trim()) {
+        if (!name.trim() || !email.trim() || !birthday || !birthMonth) {
             return res.status(400).json({
                 status: "error",
-                message: "Name, email and date cannot be empty"
+                message: "Name, email, birthday and birthMonth cannot be empty"
             })
         };
         
@@ -36,7 +36,8 @@ const addFriends = async (req, res) => {
             data:{
                 name: name.trim(),
                 email: email.trim(),
-                dob: new Date(dob)
+                birthday: birthday,
+                birthMonth: birthMonth
             }
         });
 
