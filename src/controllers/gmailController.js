@@ -22,6 +22,19 @@ const sendMail = async (req, res) => {
             })
         }
 
+        const friend = await db.friends.findUnique({
+            where: {
+                email: to
+            }
+        })
+
+        if (!friend) {
+            return res.status(404).json({
+                status: "error",
+                message: "Friend not found"
+            })
+        }
+
         const mailOptions = {
             from: req.body.from,
             to: to,
@@ -29,29 +42,50 @@ const sendMail = async (req, res) => {
             body: body,
             attachments
         };
-        const sendmail = await transporter.sendMail(mailOptions);
-        console.log("Email sent successfully: ");
 
-        await db.emailLogs.create({
-            data: {
-                from,
-                to,
-                subject,
-                body,
-                attachments,
-                status: "SUCCESS"
-            }
-        })
-        return res.status(200).json({
-            status: "success",
-            message: "Email sent successfully!"
-        })
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log("Email sent successfully: ");
+
+            await db.emailLogs.create({
+                data: {
+                    from,
+                    subject,
+                    body,
+                    attachments,
+                    status: "SUCCESS"
+                }
+            })
+            return res.status(200).json({
+                status: "success",
+                message: "Email sent successfully!"
+            })
+                
+        } catch (error) {
+            console.log("Email not sent", error.message)
+
+            await db.emailLogs.create({
+                data: {
+                    from,
+                    subject,
+                    body,
+                    attachments,
+                    status: "FAILED"
+                }
+            })
+            return res.status(500).json({
+                status: "error",
+                message: "Email sending failed"
+            })
+        }
+
+
 
 
 
     } catch (error) {
 
-        console.log("Error sending email: ", error);
+        console.log("Error sending email: ", error.message);
         return res.status(500).json({
             status: "error",
             message: "Internal server error"

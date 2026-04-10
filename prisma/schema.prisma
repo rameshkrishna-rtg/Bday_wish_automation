@@ -14,20 +14,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model EmailLogs {
+model Friends {
   id        Int      @id @default(autoincrement())
-  from      String
-  to        String
-  subject   String
-  body      String
-  attachments String?
-  status    Status
+  name      String
+  email     String   @unique
+  dob       DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
+
+  emailLogs EmailLogs[]
 }
 
+model EmailLogs {
+  id          Int      @id @default(autoincrement())
+  from        String
+  friend_id   Int
+  friend      Friends  @relation(fields: [friend_id], references: [id])
+  subject     String
+  body        String
+  attachments String?
+  status      Status
+  createdAt   DateTime @default(now())
+}
 
-enum Status{
+enum Status {
   SUCCESS
   FAILED
 }
